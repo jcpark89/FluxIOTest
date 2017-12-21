@@ -1,0 +1,23 @@
+{
+  "name": "create_react_app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.2",
+    "flux-sdk-browser": "^0.5.2",
+    "flux-sdk-helpers": "^0.1.2",
+    "flux-viewport": "^0.35.4",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-helmet": "^5.2.0",
+    "react-load-script": "0.0.6",
+    "react-scripts": "1.0.17",
+    "three": "^0.89.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
