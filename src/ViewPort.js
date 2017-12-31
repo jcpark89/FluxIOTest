@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import {Helmet} from "react-helmet";
 import './App.css';
 import {helpers,getProjects, getCells} from "./flux/helper";
 //This did not work
@@ -15,12 +14,13 @@ class ViewPort extends Component {
             cells: [],
             cell: ''
         };
-
         this.handleClick = this.handleClick.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
     componentDidMount() {
         var self = this;
+        this.initViewPort();
+
         getProjects().then(function(data) {
             var firstProject = data.entities[0];
             self.setState({
@@ -34,18 +34,32 @@ class ViewPort extends Component {
                     cells:data.entities,
                     cell: firstCell
                 });
+                self.renderViewport(null);
             });
         });
+
+
     }
-   /* initViewPort() {
+    initViewPort() {
         // Tried everything under the sun to get this section working but no dice¯\_(ツ)_/¯
                 // attach the viewport to the #div view
-                this.viewport = new FluxViewport(document.querySelector("#view"));
+                this.viewport = new window.FluxViewport(document.querySelector("#view"));
                 // set up default lighting for the viewport
                 this.viewport.setupDefaultLighting();
                 // set the viewport background to white
                 this.viewport.setClearColor(0xffffff);
-    }*/
+    }
+
+    renderViewport(data) {
+        if(!data){
+            this.viewport.setGeometryEntity(null)
+        }
+        else if (window.FluxViewport.isKnownGeom(data.value)) {
+            //add it to the viewport
+            this.viewport.setGeometryEntity(data.value)
+        }
+    }
+
     handleChange (event) {
         this.setState({project: event.target.value});
         console.log(this.state.project);
@@ -59,10 +73,6 @@ class ViewPort extends Component {
     render() {
         return (
             <div className='FluxViewPort'>
-                <Helmet>
-                    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"></meta>
-                    <script src="https://npmcdn.com/flux-viewport@0.35.4/dist/flux-viewport-bundle.global.js"></script>
-                </Helmet>
                 <header className='App-header'>
                     <h1 className='App-title'>Flux Seed Project</h1>
                     <div id='actions'>
