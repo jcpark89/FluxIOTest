@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import {helpers,getProjects, getCells} from "./flux/helper";
+import {helpers,getProjects, getCells, getValue} from "./flux/helper";
 //This did not work
 //import FluxViewport from 'flux-viewport';
 
@@ -34,7 +34,10 @@ class ViewPort extends Component {
                     cells:data.entities,
                     cell: firstCell
                 });
-                self.renderViewport(null);
+                getValue(firstProject, firstCell).then(function(data) {
+                    self.renderViewport(data);
+                });
+
             });
         });
 
