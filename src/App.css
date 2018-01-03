@@ -112,6 +112,9 @@ select{
 #cellSelect {
   width: 10%;
 }
+#projectSelect {
+    width:10%;
+}
 #view {
   position: relative;
   flex-grow: 1;
