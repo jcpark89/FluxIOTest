@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import './App.css';
 import {helpers,getProjects, getCells, getValue} from "./flux/helper";
 var _ = require('lodash');
+var THREE = require('three');
 
 class ViewPort extends Component {
     constructor(props) {
         super(props);
+
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+        this.INTERSECTED =null;
         this.state = {
             isToggleOn: true,
             projects: [],
@@ -29,7 +34,6 @@ class ViewPort extends Component {
 
             getCells(firstProject).then(function (data) {
                 var firstCell = data.entities[0];
-                console.log(data.entities);
                 self.setState({
                     cells:data.entities,
                     cell: firstCell
@@ -50,8 +54,26 @@ class ViewPort extends Component {
                 this.viewport.setupDefaultLighting();
                 // set the viewport background to white
                 this.viewport.setClearColor(0xffffff);
-    }
 
+    }
+    update() {
+        this.raycaster.setFromCamera( this.mouse, this.viewport._renderer._cameras.getCamera());
+        //raycaster isn't showing up the items
+        var intersects = this.raycaster.intersectObjects( this.viewport._renderer._scene.children );
+        if ( intersects.length > 0 ) {
+            console.log("Intersected");
+
+            if ( this.INTERSECTED !== intersects[ 0 ].object ) {
+                if ( this.INTERSECTED ) this.INTERSECTED.material.emissive.setHex( this.INTERSECTED.currentHex );
+                this.INTERSECTED = intersects[ 0 ].object;
+                this.INTERSECTED.currentHex = this.INTERSECTED.material.emissive.getHex();
+                this.INTERSECTED.material.emissive.setHex( 0xff0000 );
+            }
+        } else {
+            if ( this.INTERSECTED ) this.INTERSECTED.material.emissive.setHex( this.INTERSECTED.currentHex );
+            this.INTERSECTED = null;
+        }
+    }
     renderViewport(data) {
         if(!data){
             this.viewport.setGeometryEntity(null)
@@ -60,6 +82,12 @@ class ViewPort extends Component {
             //add it to the viewport
             this.viewport.setGeometryEntity(data.value)
         }
+    }
+    _onMouseMove(event) {
+        this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        //console.log("X: " + this.mouse.x  + ", Y:" + this.mouse.y);
+        this.update()
     }
 
     handleChange (event) {
@@ -114,7 +142,7 @@ class ViewPort extends Component {
                 </header>
                 <div className='output'>
                      <div id='geometry'>
-                        <div id='view'></div>
+                        <div id='view' onMouseMove={this._onMouseMove.bind(this)}></div>
                     </div>
                     <div className='select' id="projectSelect"><select className='project' name='projectSelect' onChange={this.handleChange.bind(this)}>{
                         this.state.projects.length ? this.state.projects.map(function(project, i){
